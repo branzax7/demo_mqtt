@@ -19,3 +19,13 @@ EXPOSE 5000
 # ENTRYPOINT ["/entrypoint.sh"]
 CMD ["python", "tema2.py"]
 # CMD ["./entrypoint.sh"]
+
+docker swarm init --advertise-addr 127.0.0.1
+docker swarm leave --force
+docker service logs lab2_grafana
+docker stack ps lab2
+docker stack rm lab2
+docker network inspect lab2_influx_network
+docker service ls
+sudo netstat -tuln | grep 3000
+docker stack deploy -c docker-compose-stack.yml lab2
