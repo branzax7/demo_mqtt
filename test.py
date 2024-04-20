@@ -17,7 +17,8 @@ client.on_publish = on_publish
 client.connect("broker.hivemq.com", 1883, 60)
 
 # This loop simulates sending messages
-data = ["data1","buna","ce faci","bravo", "scaun"]
+# data = ["data1","buna","ce faci","bravo", "scaun"]
+data = ["xxxx","yyyy","mmmmm","nnnnn", "scssssssaun"]
 client.loop_start()
 while True:
     # message = input("Enter message to publish: ")

@@ -1,0 +1,89 @@
+version: '3.3'
+
+services:
+  influxdb:
+    image: influxdb:1.8
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=mqtt_data
+      - INFLUXDB_HTTP_AUTH_ENABLED=false
+    networks:
+      - influx_network
+      - grafana_network
+    
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+      - mosquitto_config:/mosquitto/config
+    environment:
+      - MOSQUITTO_USERNAME=mihail
+      - MOSQUITTO_PASSWORD=mihail
+    networks:
+      - backend_network
+
+  adapter:
+    image: mihail17/adapter_eu
+    depends_on:
+      - mosquitto
+      - influxdb
+    environment:
+      - MQTT_HOST=mosquitto
+      - MQTT_PORT=1883
+      - INFLUXDB_HOST=influxdb
+      - INFLUXDB_PORT=8086
+    networks:
+      - backend_network
+      - influx_network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - grafana_network
+      - influx_network
+  
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - influx_network
+  
+  chronograf:
+    image: chronograf:latest
+    ports:
+      - "8888:8888"
+    depends_on:
+      - influxdb
+    volumes:
+      - chronograf_data:/var/lib/chronograf
+    networks:
+      - grafana_network
+      - influx_network
+
+volumes:
+  influxdb_data:
+  mosquitto_data:
+  mosquitto_log:
+  mosquitto_config:
+  grafana_data:
+  chronograf_data:
+
+networks:
+  backend_network:
+  grafana_network:
+  influx_network:
