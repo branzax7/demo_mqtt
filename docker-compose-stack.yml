@@ -38,7 +38,7 @@ services:
       replicas: 1
 
   adapter:
-    image: adapter4
+    image: mihail17/adapter4
     environment:
       - MQTT_HOST=mosquitto
       - MQTT_PORT=1883
