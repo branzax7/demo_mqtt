@@ -3,7 +3,7 @@ mosquito_sub -h localhost -t test
 mosquito_pub -h localhost -t test -m "Salut!"
 --remove-orphans
 docker system prune -a --volumes
-
+command: bash -c 'wait-for-service influxdb:8086 && wait-for-service mqtt_broker:1883 && python3 mqtt-api/server.py'
 
 FROM python:3.10
 COPY requirements.txt /tmp
@@ -29,3 +29,5 @@ docker network inspect lab2_influx_network
 docker service ls
 sudo netstat -tuln | grep 3000
 docker stack deploy -c docker-compose-stack.yml lab2
+docker container ls -a
+docker ps -a

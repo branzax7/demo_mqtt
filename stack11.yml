@@ -1,10 +1,8 @@
-version: '3.3'
+version: '3.8'
 
 services:
   influxdb:
     image: influxdb:1.8
-    logging:
-      driver: json-file
     volumes:
       - influxdb_data:/var/lib/influxdb
     ports:
@@ -15,7 +13,12 @@ services:
     networks:
       - influx_network
       - grafana_network
-    
+      - sceno_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role==manager"
 
   mosquitto:
     image: eclipse-mosquitto:latest
@@ -31,46 +34,46 @@ services:
       - MOSQUITTO_PASSWORD=mihail
     networks:
       - backend_network
+    deploy:
+      replicas: 1
 
   adapter:
-    # build: .
-    image: adapter4
-    depends_on:
-      - mosquitto
-      - influxdb
+    image: adapter3
     environment:
       - MQTT_HOST=mosquitto
       - MQTT_PORT=1883
       - INFLUXDB_HOST=influxdb
       - INFLUXDB_PORT=8086
-      - DEBUG_DATA_FLOW=true
     networks:
       - backend_network
       - influx_network
+    deploy:
+      replicas: 1
 
   grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
-    depends_on:
-      - influxdb
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana:/etc/grafana/provisioning
-    networks:
-      - grafana_network
-      - influx_network
     environment:
       - GF_SECURITY_ADMIN_USER=asistent
       - GF_SECURITY_ADMIN_PASSWORD=grafanaSPRC2023
-  
+    networks:
+      - grafana_network
+      - influx_network
+    deploy:
+      replicas: 1
+
   adminer:
     image: adminer
     ports:
       - 8080:8080
     networks:
       - influx_network
-  
+    deploy:
+      replicas: 1
 
 volumes:
   influxdb_data:
@@ -84,3 +87,4 @@ networks:
   backend_network:
   grafana_network:
   influx_network:
+  sceno_network:

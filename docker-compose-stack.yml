@@ -13,6 +13,7 @@ services:
     networks:
       - influx_network
       - grafana_network
+      - sceno_network
     deploy:
       replicas: 1
       placement:
@@ -37,7 +38,7 @@ services:
       replicas: 1
 
   adapter:
-    image: mihail17/adapter_eu
+    image: adapter4
     environment:
       - MQTT_HOST=mosquitto
       - MQTT_PORT=1883
@@ -55,6 +56,10 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_USER: asistent
+      GF_SECURITY_ADMIN_PASSWORD: grafanaSPRC2023
     networks:
       - grafana_network
       - influx_network
@@ -77,8 +82,8 @@ services:
     volumes:
       - chronograf_data:/var/lib/chronograf
     networks:
-      - grafana_network
       - influx_network
+      - sceno_network
     deploy:
       replicas: 1
 
@@ -94,3 +99,4 @@ networks:
   backend_network:
   grafana_network:
   influx_network:
+  sceno_network:
