@@ -33,7 +33,7 @@ services:
       - backend_network
 
   adapter:
-    # build: .
+    build: .
     image: adapter4
     depends_on:
       - mosquitto
